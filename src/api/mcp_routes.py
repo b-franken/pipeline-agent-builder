@@ -228,11 +228,12 @@ async def test_mcp_server(server_id: str) -> dict[str, Any]:
             "tool_count": len(tools),
             "tools": [t.name for t in tools],
         }
-    except Exception as e:
+    except Exception:
+        logger.exception("Failed to test MCP server %s", server.name)
         return {
             "success": False,
             "server": server.name,
-            "error": f"{type(e).__name__}: {e}",
+            "error": "Failed to connect to MCP server",
         }
 
 

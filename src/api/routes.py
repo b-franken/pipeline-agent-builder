@@ -1455,22 +1455,20 @@ async def delete_team(team_id: str) -> dict[str, str | bool]:
 async def download_document(filename: str) -> FileResponse:
     """Download a generated document (PDF, Excel, CSV)."""
     import os
-    from pathlib import Path
+    from pathlib import Path, PurePosixPath
 
     output_dir = Path(os.getenv("DOCUMENT_OUTPUT_DIR", "./data/documents")).resolve()
 
-    try:
-        file_path = (output_dir / filename).resolve()
-    except RuntimeError as e:
-        raise HTTPException(status_code=400, detail="Invalid filename") from e
-
-    if output_dir != file_path and output_dir not in file_path.parents:
+    safe_name = PurePosixPath(filename).name
+    if not safe_name or safe_name in (".", ".."):
         raise HTTPException(status_code=400, detail="Invalid filename")
 
-    if not file_path.exists():
-        raise HTTPException(status_code=404, detail=f"Document not found: {file_path.name}")
+    safe_path = output_dir / safe_name
 
-    ext = file_path.suffix.lower()
+    if not safe_path.exists():
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    ext = safe_path.suffix.lower()
     media_types = {
         ".pdf": "application/pdf",
         ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -1479,8 +1477,8 @@ async def download_document(filename: str) -> FileResponse:
     media_type = media_types.get(ext, "application/octet-stream")
 
     return FileResponse(
-        path=str(file_path),
-        filename=file_path.name,
+        path=str(safe_path),
+        filename=safe_name,
         media_type=media_type,
     )
 

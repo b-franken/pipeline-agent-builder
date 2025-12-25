@@ -336,7 +336,7 @@ class TestMCPServerTools:
         response = client.get("/api/mcp/servers/server-123/tools")
 
         assert response.status_code == 500
-        assert "Connection failed" in response.json()["detail"]
+        assert response.json()["detail"] == "Failed to get tools from MCP server"
 
 
 class TestMCPServerTest:
@@ -387,7 +387,7 @@ class TestMCPServerTest:
         assert response.status_code == 200
         data = response.json()
         assert data["success"] is False
-        assert "ConnectionError" in data["error"]
+        assert data["error"] == "Failed to connect to MCP server"
 
 
 class TestMCPRegistryPopular:
