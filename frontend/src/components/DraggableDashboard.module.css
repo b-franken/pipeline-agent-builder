@@ -1,0 +1,162 @@
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.grid {
+  flex: 1;
+  min-height: 0;
+}
+
+.editing .widget {
+  cursor: move;
+}
+
+.editing .widget::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px dashed var(--primary);
+  border-radius: var(--radius-lg);
+  pointer-events: none;
+  opacity: 0.5;
+  z-index: 10;
+}
+
+.widget {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.widget:hover {
+  border-color: var(--border-strong);
+}
+
+.widgetHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border);
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.editing .widgetHeader {
+  cursor: grab;
+  background: var(--bg-elevated);
+}
+
+.editing .widgetHeader:active {
+  cursor: grabbing;
+}
+
+.widgetTitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex: 1;
+}
+
+.dragHandle {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  opacity: 0.5;
+}
+
+.editing .dragHandle {
+  opacity: 1;
+  color: var(--primary);
+}
+
+.widgetContent {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+
+/* Override react-grid-layout styles */
+:global(.react-grid-item.react-grid-placeholder) {
+  background: var(--primary) !important;
+  opacity: 0.15 !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+:global(.react-resizable-handle) {
+  background: transparent !important;
+}
+
+:global(.react-resizable-handle::after) {
+  content: "" !important;
+  position: absolute !important;
+  right: 8px !important;
+  bottom: 8px !important;
+  width: 12px !important;
+  height: 12px !important;
+  border-right: 2px solid var(--border-strong) !important;
+  border-bottom: 2px solid var(--border-strong) !important;
+  border-radius: 0 0 4px 0 !important;
+  transition: border-color 0.2s !important;
+}
+
+.editing :global(.react-resizable-handle::after) {
+  border-color: var(--primary) !important;
+}
+
+:global(.react-grid-item > .react-resizable-handle::after) {
+  right: 8px !important;
+  bottom: 8px !important;
+}
+
+/* Smooth transitions */
+:global(.react-grid-item) {
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+:global(.react-grid-item.cssTransforms) {
+  transition: transform 0.2s ease !important;
+}
+
+:global(.react-grid-item.resizing) {
+  z-index: 100 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+}
+
+:global(.react-grid-item.react-draggable-dragging) {
+  z-index: 100 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 2px var(--primary) !important;
+  transition: none !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .toolbar {
+    flex-wrap: wrap;
+  }
+
+  .hint {
+    width: 100%;
+    margin-top: 8px;
+  }
+}

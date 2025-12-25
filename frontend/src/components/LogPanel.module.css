@@ -1,0 +1,134 @@
+.panel {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.header {
+  display: none;
+}
+
+.count {
+  background: var(--bg-tertiary);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-weight: var(--weight-medium);
+}
+
+.logs {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+.empty {
+  color: var(--text-muted);
+  text-align: center;
+  padding: var(--space-8);
+  font-family: var(--font-sans);
+}
+
+.entry {
+  display: grid;
+  grid-template-columns: 70px 24px 90px 1fr;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  align-items: start;
+  transition: background var(--transition-fast);
+}
+
+.entry:hover {
+  background: var(--hover);
+}
+
+.time {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  padding-top: 2px;
+}
+
+.icon {
+  color: var(--primary);
+  text-align: center;
+  font-size: var(--text-sm);
+}
+
+.agent {
+  color: var(--primary);
+  font-weight: var(--weight-medium);
+  font-size: var(--text-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.message {
+  color: var(--text);
+  word-break: break-word;
+  line-height: var(--leading-relaxed);
+}
+
+.entry.error .icon,
+.entry.error .message {
+  color: var(--error);
+}
+
+.entry.error {
+  background: var(--error-light);
+}
+
+.entry.handoff .icon {
+  color: var(--warning);
+}
+
+.entry.start .icon {
+  color: var(--success);
+}
+
+.entry.end .icon {
+  color: var(--text-muted);
+}
+
+.entry.tool .icon {
+  color: var(--accent);
+}
+
+.entry.response .message {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.entry.finish {
+  background: var(--success-light);
+}
+
+.entry.finish .icon,
+.entry.finish .message {
+  color: var(--success);
+  font-weight: var(--weight-semibold);
+}
+
+@media (max-width: 600px) {
+  .entry {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
+
+  .time,
+  .agent {
+    display: inline;
+  }
+
+  .icon {
+    display: none;
+  }
+}

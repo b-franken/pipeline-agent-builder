@@ -1,0 +1,352 @@
+.graphContainer {
+  width: 100%;
+  height: 100%;
+  min-height: 450px;
+  background: #121212;
+  border-radius: 0 0 8px 8px;
+}
+
+.agentNode,
+.supervisorNode {
+  padding: 14px 18px;
+  border-radius: 8px;
+  background: #282828;
+  border: 2px solid #404040;
+  min-width: 150px;
+  transition: all 0.2s ease;
+}
+
+.supervisorNode {
+  background: linear-gradient(135deg, #1a1a1a 0%, #282828 100%);
+  border-color: #1ed760;
+}
+
+.nodeIdle {
+  opacity: 0.7;
+}
+
+.nodeActive {
+  border-color: #1ed760;
+  box-shadow: 0 0 24px rgba(30, 215, 96, 0.4);
+  opacity: 1;
+  background: #1a1a1a;
+}
+
+.nodeCompleted {
+  border-color: #1ed760;
+  opacity: 1;
+}
+
+.nodeError {
+  border-color: #f15e6c;
+  opacity: 1;
+}
+
+.nodeHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.nodeName {
+  font-weight: 600;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.nodeDescription {
+  font-size: 12px;
+  color: #b3b3b3;
+  line-height: 1.4;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nodeStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 11px;
+  color: #1ed760;
+  font-weight: 500;
+}
+
+/* Pulse animation */
+.pulse {
+  width: 10px;
+  height: 10px;
+  background: #1ed760;
+  border-radius: 50%;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(30, 215, 96, 0.5);
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+    box-shadow: 0 0 12px 4px rgba(30, 215, 96, 0.3);
+  }
+}
+
+/* Start/End nodes */
+.startNode,
+.endNode {
+  padding: 12px 24px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  background: #282828;
+  border: 2px solid #404040;
+}
+
+.startNode {
+  background: #1a1a1a;
+  border-color: #1ed760;
+  color: #1ed760;
+}
+
+.endNode {
+  background: #1a1a1a;
+  border-color: #404040;
+  transition: all 0.2s ease;
+}
+
+.endReached {
+  background: #1a1a1a;
+  border-color: #1ed760;
+  color: #1ed760;
+  box-shadow: 0 0 16px rgba(30, 215, 96, 0.3);
+}
+
+/* Handles */
+.handle {
+  width: 10px;
+  height: 10px;
+  background: #1ed760;
+  border: 2px solid #121212;
+}
+
+/* React Flow overrides */
+.graphContainer :global(.react-flow__controls) {
+  background: #282828;
+  border: 1px solid #404040;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.graphContainer :global(.react-flow__controls-button) {
+  background: #282828;
+  border-color: #404040;
+  fill: #b3b3b3;
+}
+
+.graphContainer :global(.react-flow__controls-button:hover) {
+  background: #404040;
+  fill: #ffffff;
+}
+
+.graphContainer :global(.react-flow__background) {
+  background: #121212;
+}
+
+.graphContainer :global(.react-flow__edge-path) {
+  stroke: #404040;
+  stroke-width: 2;
+}
+
+.graphContainer :global(.react-flow__edge.selected .react-flow__edge-path) {
+  stroke: #1ed760;
+}
+
+/* Organogram-style team node (matching PipelineEditor) */
+.orgChart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 200px;
+  transition: all 0.2s ease;
+}
+
+.orgChart.nodeActive .orgHeader {
+  border-color: #4ade80;
+  box-shadow: 0 0 24px rgba(30, 215, 96, 0.4);
+}
+
+.orgChart.nodeCompleted .orgHeader {
+  border-color: #1ed760;
+}
+
+.orgHeader {
+  position: relative;
+  background: linear-gradient(135deg, #166534 0%, #1ed760 100%);
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 2px solid #1ed760;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.orgTitle {
+  font-weight: 600;
+  font-size: 13px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.orgLine {
+  width: 2px;
+  height: 20px;
+  background: #1ed760;
+}
+
+.orgBranches {
+  display: flex;
+  gap: 12px;
+  position: relative;
+}
+
+.orgBranches::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 40px);
+  height: 2px;
+  background: #1ed760;
+}
+
+.orgBranch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.orgBranchLine {
+  width: 2px;
+  height: 16px;
+  background: #1ed760;
+}
+
+.orgAgent {
+  position: relative;
+  background: #282828;
+  border: 2px solid #404040;
+  border-radius: 6px;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+}
+
+.orgAgent:hover {
+  border-color: #1ed760;
+}
+
+.orgAgentName {
+  font-size: 11px;
+  font-weight: 500;
+  color: #bbf7d0;
+  white-space: nowrap;
+}
+
+/* Legacy team styles for backwards compatibility */
+.teamNode {
+  padding: 14px 18px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #282828 100%);
+  border: 2px solid #a855f7;
+  min-width: 150px;
+  transition: all 0.2s ease;
+}
+
+.teamNode.nodeActive {
+  border-color: #c084fc;
+  box-shadow: 0 0 24px rgba(168, 85, 247, 0.4);
+}
+
+.teamNode.nodeCompleted {
+  border-color: #a855f7;
+}
+
+.teamAgentList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.teamAgentItem {
+  font-size: 11px;
+  color: #e9d5ff;
+  padding: 4px 8px;
+  background: rgba(168, 85, 247, 0.15);
+  border-radius: 4px;
+}
+
+/* Tool Node Styles */
+.toolNode {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #0d3320 0%, #1a4731 100%);
+  border: 2px solid #10b981;
+  border-radius: 8px;
+  min-width: 120px;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  transition: all 0.2s ease;
+}
+
+.toolNode:hover {
+  border-color: #34d399;
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+}
+
+.toolNodeIcon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.toolNodeIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.toolNodeContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.toolNodeName {
+  font-weight: 600;
+  font-size: 12px;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+
+.toolNodeTransport {
+  font-size: 9px;
+  color: #6ee7b7;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
