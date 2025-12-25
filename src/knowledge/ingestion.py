@@ -246,8 +246,9 @@ class DocumentIngester:
             import re
 
             html_content = file_path.read_text(encoding="utf-8")
-            html_content = re.sub(r"<script[^>]*>.*?</script>", "", html_content, flags=re.DOTALL | re.IGNORECASE)
-            html_content = re.sub(r"<style[^>]*>.*?</style>", "", html_content, flags=re.DOTALL | re.IGNORECASE)
+            flags = re.DOTALL | re.IGNORECASE
+            html_content = re.sub(r"<script\b[^>]*>.*?</script\b[^>]*>", "", html_content, flags=flags)
+            html_content = re.sub(r"<style\b[^>]*>.*?</style\b[^>]*>", "", html_content, flags=flags)
             text = re.sub(r"<[^>]+>", " ", html_content)
             text = re.sub(r"\s+", " ", text)
             return text.strip()
@@ -481,12 +482,13 @@ class DocumentIngester:
             )
 
         suffix = Path(filename).suffix.lower()
-        binary_types = {".pdf", ".docx", ".xlsx", ".pptx"}
+        safe_suffixes = {".pdf": ".pdf", ".docx": ".docx", ".xlsx": ".xlsx", ".pptx": ".pptx"}
 
-        if suffix in binary_types:
+        if suffix in safe_suffixes:
             import tempfile
 
-            with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+            safe_suffix = safe_suffixes[suffix]
+            with tempfile.NamedTemporaryFile(suffix=safe_suffix, delete=False) as tmp:
                 tmp.write(data)
                 tmp_path = tmp.name
 

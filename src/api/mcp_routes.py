@@ -202,7 +202,8 @@ async def get_server_tools(server_id: str) -> list[MCPToolInfo]:
             for tool in tools
         ]
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get tools: {e}") from e
+        logger.exception("Failed to get tools for server %s", server.name)
+        raise HTTPException(status_code=500, detail="Failed to get tools from MCP server") from e
 
 
 @router.post("/servers/{server_id}/test")
