@@ -1455,24 +1455,23 @@ async def delete_team(team_id: str) -> dict[str, str | bool]:
 async def download_document(filename: str) -> FileResponse:
     """Download a generated document (PDF, Excel, CSV)."""
     import os
-    import re
     from pathlib import Path
 
     output_dir = Path(os.getenv("DOCUMENT_OUTPUT_DIR", "./data/documents")).resolve()
 
-    if not re.fullmatch(r"[a-zA-Z0-9_\-\.]+", filename):
-        raise HTTPException(status_code=400, detail="Invalid filename")
-
-    if ".." in filename or "/" in filename or "\\" in filename:
-        raise HTTPException(status_code=400, detail="Invalid filename")
-
-    allowed_files = {f.name for f in output_dir.iterdir() if f.is_file()} if output_dir.exists() else set()
-    if filename not in allowed_files:
+    if not output_dir.exists():
         raise HTTPException(status_code=404, detail="Document not found")
 
-    validated_path = output_dir / filename
+    matched_file: Path | None = None
+    for f in output_dir.iterdir():
+        if f.is_file() and f.name == filename:
+            matched_file = f
+            break
 
-    ext = validated_path.suffix.lower()
+    if matched_file is None:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    ext = matched_file.suffix.lower()
     media_types = {
         ".pdf": "application/pdf",
         ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -1481,8 +1480,8 @@ async def download_document(filename: str) -> FileResponse:
     media_type = media_types.get(ext, "application/octet-stream")
 
     return FileResponse(
-        path=str(validated_path),
-        filename=filename,
+        path=str(matched_file),
+        filename=matched_file.name,
         media_type=media_type,
     )
 
