@@ -1457,15 +1457,22 @@ async def download_document(filename: str) -> FileResponse:
     import os
     from pathlib import Path
 
-    safe_filename = os.path.basename(filename)
-    if safe_filename != filename or ".." in filename:
+    # Resolve the output directory to an absolute, normalized path
+    output_dir = Path(os.getenv("DOCUMENT_OUTPUT_DIR", "./data/documents")).resolve()
+
+    # Construct full path from the (potentially nested) filename and normalize it
+    try:
+        file_path = (output_dir / filename).resolve()
+    except RuntimeError:
+        # In case of resolution issues, treat as invalid
         raise HTTPException(status_code=400, detail="Invalid filename")
 
-    output_dir = Path(os.getenv("DOCUMENT_OUTPUT_DIR", "./data/documents"))
-    file_path = output_dir / safe_filename
+    # Ensure the resolved path is within the intended output directory
+    if output_dir != file_path and output_dir not in file_path.parents:
+        raise HTTPException(status_code=400, detail="Invalid filename")
 
     if not file_path.exists():
-        raise HTTPException(status_code=404, detail=f"Document not found: {safe_filename}")
+        raise HTTPException(status_code=404, detail=f"Document not found: {file_path.name}")
 
     ext = file_path.suffix.lower()
     media_types = {
@@ -1477,7 +1484,7 @@ async def download_document(filename: str) -> FileResponse:
 
     return FileResponse(
         path=str(file_path),
-        filename=safe_filename,
+        filename=file_path.name,
         media_type=media_type,
     )
 
