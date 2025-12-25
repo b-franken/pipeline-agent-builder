@@ -246,8 +246,8 @@ class DocumentIngester:
             import re
 
             html_content = file_path.read_text(encoding="utf-8")
-            html_content = re.sub(r"<script[^>]*>.*?</script>", "", html_content, flags=re.DOTALL | re.IGNORECASE)
-            html_content = re.sub(r"<style[^>]*>.*?</style>", "", html_content, flags=re.DOTALL | re.IGNORECASE)
+            html_content = re.sub(r"<script\b[^>]*>.*?</script\b[^>]*>", "", html_content, flags=re.DOTALL | re.IGNORECASE)
+            html_content = re.sub(r"<style\b[^>]*>.*?</style\b[^>]*>", "", html_content, flags=re.DOTALL | re.IGNORECASE)
             text = re.sub(r"<[^>]+>", " ", html_content)
             text = re.sub(r"\s+", " ", text)
             return text.strip()
