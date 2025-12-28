@@ -16,6 +16,12 @@ This started as a hobby project to learn LangGraph and ended up becoming a full 
 
 ![Pipeline Builder](docs/pipeline-builder.png)
 
+## Requirements
+
+- Python 3.14+
+- Node.js 24+ (for frontend)
+- Docker (optional)
+
 ## Quick Start
 
 ### Local (easiest)

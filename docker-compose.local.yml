@@ -1,8 +1,5 @@
-# Docker Compose for Fully Local Operation with Ollama
+# Docker Compose override for fully local operation with Ollama
 # Usage: docker compose -f docker-compose.yml -f docker-compose.local.yml up
-#
-# This overrides the default configuration to use Ollama for all LLM operations.
-# No external API keys required - everything runs locally.
 
 services:
   agent:
@@ -14,44 +11,29 @@ services:
       ollama:
         condition: service_healthy
     environment:
-      # Override to use Ollama
       - PROVIDER=ollama
       - DEFAULT_MODEL=${OLLAMA_MODEL:-llama3.2}
       - OLLAMA_HOST=http://ollama:11434
-      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.2}
-      - OLLAMA_EMBED_MODEL=${OLLAMA_EMBED_MODEL:-nomic-embed-text}
-      # API keys not needed for local mode
       - OPENAI_API_KEY=
       - ANTHROPIC_API_KEY=
       - GOOGLE_API_KEY=
 
-  # Enable Ollama service (removes the profile requirement)
   ollama:
-    profiles: []  # Override to always include
-    deploy:
-      # Uncomment for NVIDIA GPU support
-      # resources:
-      #   reservations:
-      #     devices:
-      #       - driver: nvidia
-      #         count: 1
-      #         capabilities: [gpu]
-
-  # Init container to pull required models
-  ollama-init:
-    image: curlimages/curl:latest
-    container_name: agent-ollama-init
-    depends_on:
-      ollama:
-        condition: service_healthy
+    image: ollama/ollama:latest
+    container_name: agent-ollama
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
     networks:
       - agent-network
-    entrypoint: ["/bin/sh", "-c"]
-    command:
-      - |
-        echo "Pulling LLM model: ${OLLAMA_MODEL:-llama3.2}..."
-        curl -s http://ollama:11434/api/pull -d '{"name": "${OLLAMA_MODEL:-llama3.2}"}' > /dev/null
-        echo "Pulling embedding model: ${OLLAMA_EMBED_MODEL:-nomic-embed-text}..."
-        curl -s http://ollama:11434/api/pull -d '{"name": "${OLLAMA_EMBED_MODEL:-nomic-embed-text}"}' > /dev/null
-        echo "Models ready!"
-    restart: "no"
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  ollama_data:

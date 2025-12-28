@@ -1,13 +1,10 @@
 # Docker Compose for Multi-Agent AI Template
-# Versions as of December 2025:
-# - Python 3.14.2
-# - PostgreSQL 18.1 with pgvector
-# - ChromaDB 1.3.7
+#
+# Usage:
+#   docker compose up                    # With OpenAI/Anthropic (set keys in .env)
+#   docker compose -f docker-compose.yml -f docker-compose.local.yml up  # Fully local with Ollama
 
 services:
-  # ==========================================================================
-  # Agent Application
-  # ==========================================================================
   agent:
     build:
       context: .
@@ -21,27 +18,18 @@ services:
     ports:
       - "${API_PORT:-8080}:8000"
     environment:
-      # LLM Provider
       - PROVIDER=${PROVIDER:-openai}
-      - DEFAULT_MODEL=${DEFAULT_MODEL:-gpt-4-turbo-preview}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DEFAULT_MODEL=${DEFAULT_MODEL:-gpt-4o}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
-
-      # Database
       - POSTGRES_URI=postgresql://agent:${POSTGRES_PASSWORD:-agent_secret}@postgres:5432/agent_db
       - USE_POSTGRES=true
-
-      # ChromaDB
       - CHROMA_HOST=chroma
       - CHROMA_PORT=8000
-
-      # Ollama (for local LLM mode)
       - OLLAMA_HOST=${OLLAMA_HOST:-http://ollama:11434}
       - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3.2}
       - OLLAMA_EMBED_MODEL=${OLLAMA_EMBED_MODEL:-nomic-embed-text}
-
-      # Optional services
       - E2B_API_KEY=${E2B_API_KEY:-}
       - TAVILY_API_KEY=${TAVILY_API_KEY:-}
     volumes:
@@ -55,9 +43,6 @@ services:
       retries: 3
     restart: unless-stopped
 
-  # ==========================================================================
-  # PostgreSQL 18 with pgvector for checkpointing and vector search
-  # ==========================================================================
   postgres:
     image: pgvector/pgvector:pg18
     container_name: agent-postgres
@@ -66,7 +51,6 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-agent_secret}
       - POSTGRES_DB=agent_db
     volumes:
-      # PostgreSQL 18+ uses version-specific PGDATA path
       - postgres_data:/var/lib/postgresql
       - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
@@ -81,9 +65,6 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  # ==========================================================================
-  # ChromaDB 1.3.7 for vector memory
-  # ==========================================================================
   chroma:
     image: chromadb/chroma:1.3.7
     container_name: agent-chroma
@@ -91,9 +72,6 @@ services:
       - IS_PERSISTENT=TRUE
       - PERSIST_DIRECTORY=/chroma/chroma
       - ANONYMIZED_TELEMETRY=FALSE
-      # Authentication (optional, uncomment for production)
-      # - CHROMA_SERVER_AUTHN_PROVIDER=chromadb.auth.token_authn.TokenAuthenticationServerProvider
-      # - CHROMA_SERVER_AUTHN_CREDENTIALS=${CHROMA_TOKEN:-}
     volumes:
       - chroma_data:/chroma/chroma
     ports:
@@ -101,7 +79,6 @@ services:
     networks:
       - agent-network
     healthcheck:
-      # ChromaDB 1.3+ image doesn't have curl - use bash TCP check
       test: ["CMD-SHELL", "timeout 2 bash -c '</dev/tcp/localhost/8000' || exit 1"]
       interval: 10s
       timeout: 5s
@@ -109,9 +86,6 @@ services:
       start_period: 15s
     restart: unless-stopped
 
-  # ==========================================================================
-  # Next.js Frontend Dashboard
-  # ==========================================================================
   frontend:
     build:
       context: ./frontend
@@ -133,46 +107,10 @@ services:
       retries: 3
     restart: unless-stopped
 
-  # ==========================================================================
-  # Ollama for local LLM (optional - use with: docker compose --profile local-llm up)
-  # ==========================================================================
-  ollama:
-    image: ollama/ollama:latest
-    container_name: agent-ollama
-    profiles:
-      - local-llm
-    volumes:
-      - ollama_data:/root/.ollama
-    ports:
-      - "${OLLAMA_PORT:-11434}:11434"
-    networks:
-      - agent-network
-    healthcheck:
-      test: ["CMD-SHELL", "ollama list || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-    # GPU support (uncomment for NVIDIA GPU)
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
-    restart: unless-stopped
-
 volumes:
   agent_data:
-    driver: local
   postgres_data:
-    driver: local
   chroma_data:
-    driver: local
-  ollama_data:
-    driver: local
 
 networks:
   agent-network:
-    driver: bridge
